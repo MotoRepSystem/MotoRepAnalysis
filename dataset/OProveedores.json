@@ -1,0 +1,31 @@
+{
+	"name": "OProveedores",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MotoRepDW_CN",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Nombre",
+				"type": "varchar"
+			},
+			{
+				"name": "ProveedorID",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimProveedor"
+		}
+	}
+}

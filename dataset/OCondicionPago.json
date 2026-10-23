@@ -1,0 +1,31 @@
+{
+	"name": "OCondicionPago",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MotoRepDW_CN",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "CondicionPago",
+				"type": "varchar"
+			},
+			{
+				"name": "CondicionID",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimCondicionPago"
+		}
+	}
+}

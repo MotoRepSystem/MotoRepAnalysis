@@ -1,0 +1,21 @@
+{
+	"name": "ParquetMetodoPago",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "MetodoPago",
+				"folderPath": "Olap/Dimensiones",
+				"fileSystem": "motoreparchivos"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

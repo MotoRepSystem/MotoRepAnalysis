@@ -1,0 +1,21 @@
+{
+	"name": "ParquetProducto",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Productos",
+				"folderPath": "Olap/Dimensiones",
+				"fileSystem": "motoreparchivos"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
