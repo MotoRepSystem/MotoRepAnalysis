@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "motorepanalisis"
+		},
+		"MotoRepDW_CN_password": {
+			"value": ""
+		},
+		"motorepanalisis-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:motorepanalisis.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"MotoRepDW_CN_properties_typeProperties_server": {
+			"value": "sqlservers-motorep.database.windows.net"
+		},
+		"MotoRepDW_CN_properties_typeProperties_database": {
+			"value": "MotoRepDW"
+		},
+		"MotoRepDW_CN_properties_typeProperties_userName": {
+			"value": "UserAdmin"
+		},
+		"motorepanalisis-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://motorepdatalake.dfs.core.windows.net"
+		}
+	}
+}
