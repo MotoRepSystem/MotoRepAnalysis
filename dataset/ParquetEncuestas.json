@@ -1,0 +1,21 @@
+{
+	"name": "ParquetEncuestas",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Encuestas",
+				"folderPath": "Olap/Hechos",
+				"fileSystem": "motoreparchivos"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

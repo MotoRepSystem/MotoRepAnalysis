@@ -1,0 +1,21 @@
+{
+	"name": "ParquetIncidencias",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Incidencias",
+				"folderPath": "Olap/Hechos",
+				"fileSystem": "motoreparchivos"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

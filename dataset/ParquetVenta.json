@@ -1,0 +1,21 @@
+{
+	"name": "ParquetVenta",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Venta",
+				"folderPath": "Olap/Hechos",
+				"fileSystem": "motoreparchivos"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
