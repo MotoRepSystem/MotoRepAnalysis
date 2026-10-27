@@ -1,0 +1,4187 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Nombre del área de trabajo",
+			"defaultValue": "motorepal"
+		},
+		"MotoRepDW_CN_password": {
+			"type": "secureString",
+			"metadata": "Cadena protegida para \"password\"de \"MotoRepDW_CN\""
+		},
+		"motorepal-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Cadena protegida para \"connectionString\"de \"motorepal-WorkspaceDefaultSqlServer\"",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:motorepal.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"motorepanalisis-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Cadena protegida para \"connectionString\"de \"motorepanalisis-WorkspaceDefaultSqlServer\"",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:motorepanalisis.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"MotoRepDW_CN_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "serverbdmotorep.database.windows.net"
+		},
+		"MotoRepDW_CN_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "MotoRepDW"
+		},
+		"MotoRepDW_CN_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "UserAdmin"
+		},
+		"motorepal-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://motorepdl.dfs.core.windows.net"
+		},
+		"motorepanalisis-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://motorepdl.dfs.core.windows.net/"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/MotoRepCube')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Pipeline 1')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Ventas",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.FactVenta"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Ventas/FactVentas"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "NumFactura",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "NumFactura",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "Cantidad",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "Cantidad",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "PrecioUnitario",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 10
+										},
+										"sink": {
+											"name": "PrecioUnitario",
+											"type": "Decimal",
+											"physicalType": "DECIMAL"
+										}
+									},
+									{
+										"source": {
+											"name": "Subtotal",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 10
+										},
+										"sink": {
+											"name": "Subtotal",
+											"type": "Decimal",
+											"physicalType": "DECIMAL"
+										}
+									},
+									{
+										"source": {
+											"name": "CostoTotal",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 10
+										},
+										"sink": {
+											"name": "CostoTotal",
+											"type": "Decimal",
+											"physicalType": "DECIMAL"
+										}
+									},
+									{
+										"source": {
+											"name": "Utilidad",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 10
+										},
+										"sink": {
+											"name": "Utilidad",
+											"type": "Decimal",
+											"physicalType": "DECIMAL"
+										}
+									},
+									{
+										"source": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idProducto",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idProducto",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idEmpleado",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idEmpleado",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idCliente",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idCliente",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idCondicionPago",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idCondicionPago",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "VentaID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "VentaID",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OVentas",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetVentas",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Compras",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Ventas",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.FactCompra"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Hechos/Compras"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "NumCompra",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "NumCompra",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Cantidad",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "Cantidad",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "PrecioUnitario",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 10
+										},
+										"sink": {
+											"name": "PrecioUnitario",
+											"type": "Decimal",
+											"physicalType": "DECIMAL"
+										}
+									},
+									{
+										"source": {
+											"name": "Subtotal",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 10
+										},
+										"sink": {
+											"name": "Subtotal",
+											"type": "Decimal",
+											"physicalType": "DECIMAL"
+										}
+									},
+									{
+										"source": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idProducto",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idProducto",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idCondicionPago",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idCondicionPago",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idProveedor",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idProveedor",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "CompraID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "CompraID",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OCompras",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetCompras",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Pagos",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Compras",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.FactPago"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Hechos/Pagos"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "Monto",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 10
+										},
+										"sink": {
+											"name": "Monto",
+											"type": "Decimal",
+											"physicalType": "DECIMAL"
+										}
+									},
+									{
+										"source": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idEmpleado",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idEmpleado",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idMetodoPago",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idMetodoPago",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "PagoID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "PagoID",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "NumeroDocumento",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "NumeroDocumento",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "TipoDocumento",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "TipoDocumento",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OPagos",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetPagos",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Encuestas",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Pagos",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "SatisfaccionGeneral",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "SatisfaccionGeneral",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "AtencionPersonal",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "AtencionPersonal",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "Experiencia",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "Experiencia",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "FacilidadEncontrarProductos",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "FacilidadEncontrarProductos",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "VariedadProductos",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "VariedadProductos",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "CantidadComentarioServicio",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "CantidadComentarioServicio",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "CantidadComentarioMejora",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "CantidadComentarioMejora",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "EncuestaID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "EncuestaID",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "idPreferenciaMarca",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idPreferenciaMarca",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idCliente",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idCliente",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OEncuestas",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetEncuestas",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Incidencias",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Encuestas",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.FactIncidencias"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Hechos/Incidencias"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "MontoInvolucrado",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 10
+										},
+										"sink": {
+											"name": "MontoInvolucrado",
+											"type": "Decimal",
+											"physicalType": "DECIMAL"
+										}
+									},
+									{
+										"source": {
+											"name": "Prioridad",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "Prioridad",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "TieneEvidencia",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "TieneEvidencia",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "IncidenciaID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "IncidenciaID",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "idTipoIncidencia",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idTipoIncidencia",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idDetalleIncidencia",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idDetalleIncidencia",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idCliente",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idCliente",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idEmpleado",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idEmpleado",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idOrigenIncidencia",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idOrigenIncidencia",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OIncidencias",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetIncidencias",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "PreferenciaProducto",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Incidencias",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.FactPreferenciaProducto"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Hechos/PreferenciaProducto"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "CantidadMension",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "CantidadMension",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "EncuestaID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "EncuestaID",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "idProductoPreferido",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idProductoPreferido",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idCliente",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idCliente",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "idTiempo",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OPreferencia",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetPreferenciaProdcuto",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Tiempo",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimTiempo"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/Tiempo"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "Fecha",
+											"type": "Date",
+											"physicalType": "date"
+										},
+										"sink": {
+											"name": "Fecha",
+											"type": "Date"
+										}
+									},
+									{
+										"source": {
+											"name": "Dia",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "Dia",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "Mes",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "Mes",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "Year",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "Year",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									},
+									{
+										"source": {
+											"name": "Trimestre",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Trimestre",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "NombreDia",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "NombreDia",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "NombreMes",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "NombreMes",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OTiempo",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetTiempo",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Producto",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Tiempo",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimProducto"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/Productos"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "Producto",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Producto",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Categoria",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Categoria",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "MarcaProducto",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "MarcaProducto",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Moto",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Moto",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "MarcaMoto",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "MarcaMoto",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Color",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Color",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Tamaño",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Tamaño",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "ProductoID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "ProductoID",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OProducto",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetProducto",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Proveedores",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Producto",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimProveedor"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/Proveedores"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "Nombre",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Nombre",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "ProveedorID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "ProveedorID",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OProveedores",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetProveedores",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Empleados",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Proveedores",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimEmpleado"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/Empleados"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "NombreCompleto",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "NombreCompleto",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "EmpleadoID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "EmpleadoID",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OEmpleados",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetEmpleados",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "MetodoPago",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Empleados",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimMetodoPago"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/MetodoPago"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "TipoMetodoPago",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "TipoMetodoPago",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "MetodoID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "MetodoID",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OMetodoPago",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetMetodoPago",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "CondicionPago",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "MetodoPago",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimCondicionPago"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/CondicionPago"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "CondicionPago",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "CondicionPago",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "CondicionID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "CondicionID",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OCondicionPago",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetCondicionPago",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "PreferenciaMarca",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimPreferenciaMarca"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/PreferenciaMarca"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "Marcas",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Marcas",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OPreferenciaMarca",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetPreferenciaMarca",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "OrigenIncidencia",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "PreferenciaMarca",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimOrigenIncidencia"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/OrigenIncidencia"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "Origen",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Origen",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OOrigenIncidencia",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetOrigenIncidencia",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "TipoIncidencia",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "OrigenIncidencia",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimTipoIncidencia"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/TipoIncidencia"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "TipoDescripcion",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "TipoDescripcion",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OTipoIncidencia",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetTipoIncidencia",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "ProductoPreferido",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "TipoIncidencia",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimProductoPreferido"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/ProductoPreferido"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "NombreProducto",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "NombreProducto",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OProductoPreferido",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetProductoPreferido",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "DetalleIncidencia",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ProductoPreferido",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimDetalleIncidencia"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/DetalleIncidencia"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "CategoriaIncidencia",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "CategoriaIncidencia",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Descripcion",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Descripcion",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ODetalleIncidencia",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetDetalleIncidencia",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Cliente",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "CondicionPago",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.DimCliente"
+							},
+							{
+								"name": "Destination",
+								"value": "motoreparchivos/Olap/Dimensiones/Clientes"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int64",
+											"physicalType": "INT_64"
+										}
+									},
+									{
+										"source": {
+											"name": "NombreCompleto",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "NombreCompleto",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "ClienteID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "ClienteID",
+											"type": "Int32",
+											"physicalType": "INT_32"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Cliente",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ParquetCliente",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/OVentas')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetVentas')]",
+				"[concat(variables('workspaceId'), '/datasets/OCompras')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetCompras')]",
+				"[concat(variables('workspaceId'), '/datasets/OPagos')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetPagos')]",
+				"[concat(variables('workspaceId'), '/datasets/OEncuestas')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetEncuestas')]",
+				"[concat(variables('workspaceId'), '/datasets/OIncidencias')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetIncidencias')]",
+				"[concat(variables('workspaceId'), '/datasets/OPreferencia')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetPreferenciaProdcuto')]",
+				"[concat(variables('workspaceId'), '/datasets/OTiempo')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetTiempo')]",
+				"[concat(variables('workspaceId'), '/datasets/OProducto')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetProducto')]",
+				"[concat(variables('workspaceId'), '/datasets/OProveedores')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetProveedores')]",
+				"[concat(variables('workspaceId'), '/datasets/OEmpleados')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetEmpleados')]",
+				"[concat(variables('workspaceId'), '/datasets/OMetodoPago')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetMetodoPago')]",
+				"[concat(variables('workspaceId'), '/datasets/OCondicionPago')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetCondicionPago')]",
+				"[concat(variables('workspaceId'), '/datasets/OPreferenciaMarca')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetPreferenciaMarca')]",
+				"[concat(variables('workspaceId'), '/datasets/OOrigenIncidencia')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetOrigenIncidencia')]",
+				"[concat(variables('workspaceId'), '/datasets/OTipoIncidencia')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetTipoIncidencia')]",
+				"[concat(variables('workspaceId'), '/datasets/OProductoPreferido')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetProductoPreferido')]",
+				"[concat(variables('workspaceId'), '/datasets/ODetalleIncidencia')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetDetalleIncidencia')]",
+				"[concat(variables('workspaceId'), '/datasets/Cliente')]",
+				"[concat(variables('workspaceId'), '/datasets/ParquetCliente')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Cliente')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "NombreCompleto",
+						"type": "varchar"
+					},
+					{
+						"name": "ClienteID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimCliente"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DimCliente')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "NombreCompleto",
+						"type": "varchar"
+					},
+					{
+						"name": "ClienteID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimCliente"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OCompras')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "NumCompra",
+						"type": "varchar"
+					},
+					{
+						"name": "Cantidad",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PrecioUnitario",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "Subtotal",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "idTiempo",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idProducto",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idCondicionPago",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idProveedor",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "CompraID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FactCompra"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OCondicionPago')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "CondicionPago",
+						"type": "varchar"
+					},
+					{
+						"name": "CondicionID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimCondicionPago"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ODetalleIncidencia')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "CategoriaIncidencia",
+						"type": "varchar"
+					},
+					{
+						"name": "Descripcion",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimDetalleIncidencia"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OEmpleados')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "NombreCompleto",
+						"type": "varchar"
+					},
+					{
+						"name": "EmpleadoID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimEmpleado"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OEncuestas')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SatisfaccionGeneral",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AtencionPersonal",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Experiencia",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FacilidadEncontrarProductos",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "VariedadProductos",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CantidadComentarioServicio",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CantidadComentarioMejora",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EncuestaID",
+						"type": "varchar"
+					},
+					{
+						"name": "idPreferenciaMarca",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idCliente",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idTiempo",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FactEncuesta"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OIncidencias')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "MontoInvolucrado",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "Prioridad",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TieneEvidencia",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "IncidenciaID",
+						"type": "varchar"
+					},
+					{
+						"name": "idTipoIncidencia",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idDetalleIncidencia",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idCliente",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idEmpleado",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idTiempo",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idOrigenIncidencia",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FactIncidencias"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OMetodoPago')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "TipoMetodoPago",
+						"type": "varchar"
+					},
+					{
+						"name": "MetodoID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimMetodoPago"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OOrigenIncidencia')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Origen",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimOrigenIncidencia"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OPagos')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Monto",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "idTiempo",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idEmpleado",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idMetodoPago",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PagoID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NumeroDocumento",
+						"type": "varchar"
+					},
+					{
+						"name": "TipoDocumento",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FactPago"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OPreferencia')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "CantidadMension",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EncuestaID",
+						"type": "varchar"
+					},
+					{
+						"name": "idProductoPreferido",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idCliente",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idTiempo",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FactPreferenciaProducto"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OPreferenciaMarca')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Marcas",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimPreferenciaMarca"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OProducto')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Producto",
+						"type": "varchar"
+					},
+					{
+						"name": "Categoria",
+						"type": "varchar"
+					},
+					{
+						"name": "MarcaProducto",
+						"type": "varchar"
+					},
+					{
+						"name": "Moto",
+						"type": "varchar"
+					},
+					{
+						"name": "MarcaMoto",
+						"type": "varchar"
+					},
+					{
+						"name": "Color",
+						"type": "varchar"
+					},
+					{
+						"name": "Tamaño",
+						"type": "varchar"
+					},
+					{
+						"name": "ProductoID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimProducto"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OProductoPreferido')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "NombreProducto",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimProductoPreferido"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OProveedores')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Nombre",
+						"type": "varchar"
+					},
+					{
+						"name": "ProveedorID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimProveedor"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OTiempo')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Fecha",
+						"type": "date"
+					},
+					{
+						"name": "Dia",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Mes",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Year",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Trimestre",
+						"type": "varchar"
+					},
+					{
+						"name": "NombreDia",
+						"type": "varchar"
+					},
+					{
+						"name": "NombreMes",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimTiempo"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OTipoIncidencia')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "TipoDescripcion",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimTipoIncidencia"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/OVentas')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MotoRepDW_CN",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "NumFactura",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Cantidad",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PrecioUnitario",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "Subtotal",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "CostoTotal",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "Utilidad",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "idTiempo",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idProducto",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idEmpleado",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idCliente",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "idCondicionPago",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "VentaID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FactVenta"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MotoRepDW_CN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetCliente')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Cliente",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetCompras')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Compras",
+						"folderPath": "Olap/Hechos",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetCondicionPago')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "CondicionPago",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetDetalleIncidencia')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "DetalleIncidencia",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetEmpleados')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Empleados",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetEncuestas')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Encuentas",
+						"folderPath": "Olap/Hechos",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetIncidencias')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Incidencias",
+						"folderPath": "Olap/Hechos",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetMetodoPago')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "MetodoPago",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetOrigenIncidencia')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OrigenIncidencia",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetPagos')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Pagos",
+						"folderPath": "Olap/Hechos",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetPreferenciaMarca')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "PreferenciaMarca",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetPreferenciaProdcuto')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "PreferenciaProducto",
+						"folderPath": "Olap/Hechos",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetProducto')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Producto",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetProductoPreferido')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "ProductoPreferido",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetProveedores')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Proveedor",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetTiempo')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Tiempo",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetTipoIncidencia')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "TipoIncidencia",
+						"folderPath": "Olap/Dimensiones",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetVenta')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Venta",
+						"folderPath": "Olap/Hechos",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ParquetVentas')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Ventas",
+						"folderPath": "Olap/Hechos",
+						"fileSystem": "motoreparchivos"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/motorepanalisis-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MotoRepDW_CN')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('MotoRepDW_CN_properties_typeProperties_server')]",
+					"database": "[parameters('MotoRepDW_CN_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('MotoRepDW_CN_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('MotoRepDW_CN_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/motorepal-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('motorepal-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/motorepal-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('motorepal-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/motorepanalisis-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('motorepanalisis-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/motorepanalisis-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('motorepanalisis-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "WITH VentasPorFactura AS (\n    SELECT\n        idCliente,\n        NumFactura,\n        idTiempo,\n        SUM(Subtotal) AS TotalFactura\n    FROM OPENROWSET(\n        BULK 'https://motorepdatalake.dfs.core.windows.net/motoreparchivos/Olap/Hechos/Ventas',\n        FORMAT = 'PARQUET'\n    ) AS v\n    GROUP BY\n        idCliente,\n        NumFactura,\n        idTiempo\n),\nEncuestas AS (\n    SELECT\n        idCliente,\n        idTiempo,\n        SatisfaccionGeneral\n    FROM OPENROWSET(\n        BULK 'https://motorepdatalake.dfs.core.windows.net/motoreparchivos/Olap/Hechos/Encuestas',\n        FORMAT = 'PARQUET'\n    ) AS e\n)\nSELECT\n    v.idTiempo / 10000 AS Anio,\n    (v.idTiempo / 100) % 100 AS Mes,\n    e.SatisfaccionGeneral AS NivelSatisfaccion,\n    SUM(v.TotalFactura) AS TotalVentas,\n    COUNT(DISTINCT v.NumFactura) AS CantidadFacturas\nFROM VentasPorFactura v\nINNER JOIN Encuestas e\n    ON v.idCliente = e.idCliente\n    AND v.idTiempo = e.idTiempo\nGROUP BY\n    v.idTiempo / 10000,\n    (v.idTiempo / 100) % 100,\n    e.SatisfaccionGeneral\nORDER BY\n    Anio,\n    Mes,\n    NivelSatisfaccion;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": -1
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MotoRepCube')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "westus"
+		}
+	]
+}
