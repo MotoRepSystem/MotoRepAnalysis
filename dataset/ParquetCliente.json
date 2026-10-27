@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Clientes",
+				"fileName": "Cliente",
 				"folderPath": "Olap/Dimensiones",
 				"fileSystem": "motoreparchivos"
 			},
