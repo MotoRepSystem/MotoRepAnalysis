@@ -2,7 +2,7 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "SELECT name AS NombreTabla\nFROM sys.tables\nWHERE name LIKE 'Dim%'\n   OR name LIKE 'Fact%'\nORDER BY name;",
+			"query": "SELECT\n    USER_NAME() AS UsuarioActual,\n    IS_MEMBER('db_owner') AS EsPropietarioBD;",
 			"metadata": {
 				"language": "sql"
 			},
