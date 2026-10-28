@@ -44,10 +44,6 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimTiempo"
-		},
-		"sqlPool": {
-			"referenceName": "MotoRepCube",
-			"type": "SqlPoolReference"
 		}
 	}
 }

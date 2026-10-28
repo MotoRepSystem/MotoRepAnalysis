@@ -17,10 +17,6 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimOrigenIncidencia"
-		},
-		"sqlPool": {
-			"referenceName": "MotoRepCube",
-			"type": "SqlPoolReference"
 		}
 	}
 }

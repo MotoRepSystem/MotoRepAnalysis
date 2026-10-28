@@ -37,10 +37,6 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "FactPreferenciaProducto"
-		},
-		"sqlPool": {
-			"referenceName": "MotoRepCube",
-			"type": "SqlPoolReference"
 		}
 	}
 }

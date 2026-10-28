@@ -22,10 +22,6 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimCondicionPago"
-		},
-		"sqlPool": {
-			"referenceName": "MotoRepCube",
-			"type": "SqlPoolReference"
 		}
 	}
 }

@@ -21,10 +21,6 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimDetalleIncidencia"
-		},
-		"sqlPool": {
-			"referenceName": "MotoRepCube",
-			"type": "SqlPoolReference"
 		}
 	}
 }

@@ -63,10 +63,6 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "FactIncidencias"
-		},
-		"sqlPool": {
-			"referenceName": "MotoRepCube",
-			"type": "SqlPoolReference"
 		}
 	}
 }

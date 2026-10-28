@@ -7,10 +7,6 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimCliente"
-		},
-		"sqlPool": {
-			"referenceName": "MotoRepCube",
-			"type": "SqlPoolReference"
 		}
 	}
 }

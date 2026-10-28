@@ -17,10 +17,6 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimPreferenciaMarca"
-		},
-		"sqlPool": {
-			"referenceName": "MotoRepCube",
-			"type": "SqlPoolReference"
 		}
 	}
 }
