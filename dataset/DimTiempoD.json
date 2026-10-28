@@ -1,0 +1,53 @@
+{
+	"name": "DimTiempoD",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Fecha",
+				"type": "date"
+			},
+			{
+				"name": "Dia",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Mes",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Year",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Trimestre",
+				"type": "varchar"
+			},
+			{
+				"name": "NombreDia",
+				"type": "varchar"
+			},
+			{
+				"name": "NombreMes",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimTiempo"
+		},
+		"sqlPool": {
+			"referenceName": "MotoRepCube",
+			"type": "SqlPoolReference"
+		}
+	}
+}

@@ -1,0 +1,46 @@
+{
+	"name": "FactPreferenciaProductoD",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "CantidadMension",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "EncuestaID",
+				"type": "varchar"
+			},
+			{
+				"name": "idProductoPreferido",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "idCliente",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "idTiempo",
+				"type": "bigint",
+				"precision": 19
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "FactPreferenciaProducto"
+		},
+		"sqlPool": {
+			"referenceName": "MotoRepCube",
+			"type": "SqlPoolReference"
+		}
+	}
+}

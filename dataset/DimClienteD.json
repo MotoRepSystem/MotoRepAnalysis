@@ -1,0 +1,16 @@
+{
+	"name": "DimClienteD",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimCliente"
+		},
+		"sqlPool": {
+			"referenceName": "MotoRepCube",
+			"type": "SqlPoolReference"
+		}
+	}
+}

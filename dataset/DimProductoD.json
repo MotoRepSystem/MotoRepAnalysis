@@ -1,0 +1,55 @@
+{
+	"name": "DimProductoD",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Producto",
+				"type": "varchar"
+			},
+			{
+				"name": "Categoria",
+				"type": "varchar"
+			},
+			{
+				"name": "MarcaProducto",
+				"type": "varchar"
+			},
+			{
+				"name": "Moto",
+				"type": "varchar"
+			},
+			{
+				"name": "MarcaMoto",
+				"type": "varchar"
+			},
+			{
+				"name": "Color",
+				"type": "varchar"
+			},
+			{
+				"name": "Tamaño",
+				"type": "varchar"
+			},
+			{
+				"name": "ProductoID",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimProducto"
+		},
+		"sqlPool": {
+			"referenceName": "MotoRepCube",
+			"type": "SqlPoolReference"
+		}
+	}
+}

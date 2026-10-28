@@ -1,0 +1,31 @@
+{
+	"name": "EmpleadoD",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "NombreCompleto",
+				"type": "varchar"
+			},
+			{
+				"name": "EmpleadoID",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimEmpleado"
+		},
+		"sqlPool": {
+			"referenceName": "MotoRepCube",
+			"type": "SqlPoolReference"
+		}
+	}
+}

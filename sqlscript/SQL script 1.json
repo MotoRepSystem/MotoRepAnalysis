@@ -2,13 +2,13 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "WITH VentasPorFactura AS (\n    SELECT\n        idCliente,\n        NumFactura,\n        idTiempo,\n        SUM(Subtotal) AS TotalFactura\n    FROM OPENROWSET(\n        BULK 'https://motorepdatalake.dfs.core.windows.net/motoreparchivos/Olap/Hechos/Ventas',\n        FORMAT = 'PARQUET'\n    ) AS v\n    GROUP BY\n        idCliente,\n        NumFactura,\n        idTiempo\n),\nEncuestas AS (\n    SELECT\n        idCliente,\n        idTiempo,\n        SatisfaccionGeneral\n    FROM OPENROWSET(\n        BULK 'https://motorepdatalake.dfs.core.windows.net/motoreparchivos/Olap/Hechos/Encuestas',\n        FORMAT = 'PARQUET'\n    ) AS e\n)\nSELECT\n    v.idTiempo / 10000 AS Anio,\n    (v.idTiempo / 100) % 100 AS Mes,\n    e.SatisfaccionGeneral AS NivelSatisfaccion,\n    SUM(v.TotalFactura) AS TotalVentas,\n    COUNT(DISTINCT v.NumFactura) AS CantidadFacturas\nFROM VentasPorFactura v\nINNER JOIN Encuestas e\n    ON v.idCliente = e.idCliente\n    AND v.idTiempo = e.idTiempo\nGROUP BY\n    v.idTiempo / 10000,\n    (v.idTiempo / 100) % 100,\n    e.SatisfaccionGeneral\nORDER BY\n    Anio,\n    Mes,\n    NivelSatisfaccion;",
+			"query": "SELECT name AS NombreTabla\nFROM sys.tables\nWHERE name LIKE 'Dim%'\n   OR name LIKE 'Fact%'\nORDER BY name;",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
-				"poolName": "Built-in"
+				"databaseName": "MotoRepCube",
+				"poolName": "MotoRepCube"
 			},
 			"resultLimit": -1
 		},
