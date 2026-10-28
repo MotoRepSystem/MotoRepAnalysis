@@ -1,0 +1,10 @@
+{
+	"name": "synapse-ws-sql--synapse-motorep-analytics",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/525b7efe-a6af-4145-92c9-3e802fcc6a8b/resourceGroups/MotoRep_ETL_Analysis/providers/Microsoft.Synapse/workspaces/synapse-motorep-analytics",
+		"groupId": "sql",
+		"fqdns": [
+			"synapse-motorep-analytics.054ceb07-3ecd-49e8-9580-6ad15b14f789.sql.azuresynapse.net"
+		]
+	}
+}

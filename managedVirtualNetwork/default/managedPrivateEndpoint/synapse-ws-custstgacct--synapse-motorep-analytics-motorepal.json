@@ -1,0 +1,7 @@
+{
+	"name": "synapse-ws-custstgacct--synapse-motorep-analytics-motorepal",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/525b7efe-a6af-4145-92c9-3e802fcc6a8b/resourceGroups/MotoRep_ETL_Analysis/providers/Microsoft.Storage/storageAccounts/motorepal",
+		"groupId": "dfs"
+	}
+}
