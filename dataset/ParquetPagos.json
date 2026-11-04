@@ -2,7 +2,7 @@
 	"name": "ParquetPagos",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+			"referenceName": "dlmotorep-WorkspaceDefaultStorage",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -12,7 +12,7 @@
 				"type": "AzureBlobFSLocation",
 				"fileName": "Pagos",
 				"folderPath": "Olap/Hechos",
-				"fileSystem": "motoreparchivos"
+				"fileSystem": "motorep"
 			},
 			"compressionCodec": "snappy"
 		},
