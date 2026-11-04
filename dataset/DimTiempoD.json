@@ -44,6 +44,10 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimTiempo"
+		},
+		"sqlPool": {
+			"referenceName": "MOTOREPPL",
+			"type": "SqlPoolReference"
 		}
 	}
 }

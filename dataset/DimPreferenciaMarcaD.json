@@ -17,6 +17,10 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimPreferenciaMarca"
+		},
+		"sqlPool": {
+			"referenceName": "MOTOREPPL",
+			"type": "SqlPoolReference"
 		}
 	}
 }

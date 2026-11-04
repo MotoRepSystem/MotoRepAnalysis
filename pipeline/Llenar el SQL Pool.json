@@ -697,7 +697,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"allowCopyCommand": true
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"Marcas"
+							],
+							"interimSchemaName": ""
+						}
 					},
 					"enableStaging": false,
 					"translator": {
@@ -723,7 +729,12 @@
 									"type": "String"
 								}
 							}
-						]
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
 					}
 				},
 				"inputs": [
@@ -781,7 +792,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"ProductoID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -959,7 +976,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"NombreProducto"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -1053,7 +1076,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"ProveedorID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -1159,7 +1188,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"Fecha"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -1325,7 +1360,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"TipoDescripcion"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
