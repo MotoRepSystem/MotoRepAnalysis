@@ -63,6 +63,10 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "FactIncidencias"
+		},
+		"sqlPool": {
+			"referenceName": "MOTOREPPL",
+			"type": "SqlPoolReference"
 		}
 	}
 }

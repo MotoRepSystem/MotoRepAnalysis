@@ -47,6 +47,10 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "FactPago"
+		},
+		"sqlPool": {
+			"referenceName": "MOTOREPPL",
+			"type": "SqlPoolReference"
 		}
 	}
 }

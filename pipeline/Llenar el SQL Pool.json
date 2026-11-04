@@ -1460,7 +1460,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"allowCopyCommand": true
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"CompraID"
+							],
+							"interimSchemaName": ""
+						}
 					},
 					"enableStaging": false,
 					"translator": {
@@ -1566,7 +1572,12 @@
 									"type": "Int32"
 								}
 							}
-						]
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
 					}
 				},
 				"inputs": [
@@ -1583,7 +1594,7 @@
 				]
 			},
 			{
-				"name": "FcatPago",
+				"name": "FactPago",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -1624,7 +1635,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"PagoID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -1757,7 +1774,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "FcatPago",
+						"activity": "FactPago",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -1794,7 +1811,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"VentaID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -2036,7 +2059,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"EncuestaID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -2250,7 +2279,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"IncidenciaID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -2456,7 +2491,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"EncuestaID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
