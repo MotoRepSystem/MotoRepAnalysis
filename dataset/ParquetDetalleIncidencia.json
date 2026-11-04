@@ -2,7 +2,7 @@
 	"name": "ParquetDetalleIncidencia",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
+			"referenceName": "dlmotorep-WorkspaceDefaultStorage",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -12,7 +12,7 @@
 				"type": "AzureBlobFSLocation",
 				"fileName": "DetalleIncidencia",
 				"folderPath": "Olap/Dimensiones",
-				"fileSystem": "motoreparchivos"
+				"fileSystem": "motorep"
 			},
 			"compressionCodec": "snappy"
 		},
