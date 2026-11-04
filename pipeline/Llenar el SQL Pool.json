@@ -110,14 +110,7 @@
 			{
 				"name": "DimEmpleado",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimCliente",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -222,14 +215,7 @@
 			{
 				"name": "DimCondicionPago",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimEmpleado",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -334,14 +320,7 @@
 			{
 				"name": "DimDetalleIncidencia",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimCondicionPago",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -446,14 +425,7 @@
 			{
 				"name": "DimMetodoPago",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimDetalleIncidencia",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -558,14 +530,7 @@
 			{
 				"name": "DimOrigenIncidencia",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimMetodoPago",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -658,14 +623,7 @@
 			{
 				"name": "DimPreferenciaMarcaD",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimOrigenIncidencia",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -753,14 +711,7 @@
 			{
 				"name": "DimProducto",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimPreferenciaMarcaD",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -937,14 +888,7 @@
 			{
 				"name": "DimProductoPreferido",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimProducto",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1037,14 +981,7 @@
 			{
 				"name": "DimProveedor",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimProductoPreferido",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1149,14 +1086,7 @@
 			{
 				"name": "DimTiempo",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimProveedor",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1321,14 +1251,7 @@
 			{
 				"name": "DimTipoIncidencia",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimTiempo",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1421,14 +1344,7 @@
 			{
 				"name": "FactCompra",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DimTipoIncidencia",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1596,14 +1512,7 @@
 			{
 				"name": "FactPago",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "FactCompra",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1772,14 +1681,7 @@
 			{
 				"name": "FactVenta",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "FactPago",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -2020,14 +1922,7 @@
 			{
 				"name": "FactEncuesta",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "FactVenta",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -2240,14 +2135,7 @@
 			{
 				"name": "FactIncidencia",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "FactEncuesta",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -2452,14 +2340,7 @@
 			{
 				"name": "FactPreferenciaProducto",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "FactIncidencia",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
