@@ -230,14 +230,7 @@
 			{
 				"name": "Compras",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Ventas",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -422,14 +415,7 @@
 			{
 				"name": "Pagos",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Compras",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -588,14 +574,7 @@
 			{
 				"name": "Encuestas",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Pagos",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -791,14 +770,7 @@
 			{
 				"name": "Incidencias",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Encuestas",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -993,14 +965,7 @@
 			{
 				"name": "PreferenciaProducto",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Incidencias",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1289,14 +1254,7 @@
 			{
 				"name": "Producto",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Tiempo",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1465,14 +1423,7 @@
 			{
 				"name": "Proveedores",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Producto",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1569,14 +1520,7 @@
 			{
 				"name": "Empleados",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Proveedores",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1673,14 +1617,7 @@
 			{
 				"name": "MetodoPago",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Empleados",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1777,14 +1714,7 @@
 			{
 				"name": "CondicionPago",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "MetodoPago",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1966,14 +1896,7 @@
 			{
 				"name": "OrigenIncidencia",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "PreferenciaMarca",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -2058,14 +1981,7 @@
 			{
 				"name": "TipoIncidencia",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "OrigenIncidencia",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -2150,14 +2066,7 @@
 			{
 				"name": "ProductoPreferido",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "TipoIncidencia",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -2242,14 +2151,7 @@
 			{
 				"name": "DetalleIncidencia",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "ProductoPreferido",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -2346,14 +2248,7 @@
 			{
 				"name": "Cliente",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "CondicionPago",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,

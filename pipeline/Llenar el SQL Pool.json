@@ -37,7 +37,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"ClienteID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -143,7 +149,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"EmpleadoID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -249,7 +261,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"CondicionID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -355,7 +373,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"CategoriaIncidencia"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -461,7 +485,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"MetodoID"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
@@ -567,7 +597,13 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
+						"writeBehavior": "Upsert",
+						"upsertSettings": {
+							"keys": [
+								"Origen"
+							],
+							"interimSchemaName": ""
+						},
 						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,

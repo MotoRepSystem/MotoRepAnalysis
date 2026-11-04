@@ -22,6 +22,10 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimEmpleado"
+		},
+		"sqlPool": {
+			"referenceName": "MOTOREPPL",
+			"type": "SqlPoolReference"
 		}
 	}
 }

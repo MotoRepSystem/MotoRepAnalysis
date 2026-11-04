@@ -17,6 +17,10 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimOrigenIncidencia"
+		},
+		"sqlPool": {
+			"referenceName": "MOTOREPPL",
+			"type": "SqlPoolReference"
 		}
 	}
 }

@@ -1,10 +1,6 @@
 {
 	"name": "ParquetVenta",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "motorepanalisis-WorkspaceDefaultStorage",
-			"type": "LinkedServiceReference"
-		},
 		"annotations": [],
 		"type": "Parquet",
 		"typeProperties": {

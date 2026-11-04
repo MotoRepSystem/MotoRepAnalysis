@@ -7,6 +7,10 @@
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "DimCliente"
+		},
+		"sqlPool": {
+			"referenceName": "MOTOREPPL",
+			"type": "SqlPoolReference"
 		}
 	}
 }
